@@ -15,6 +15,7 @@ import fb.fandroid.adv.joindbviewmodelapp.ApiUtils;
 import fb.fandroid.adv.joindbviewmodelapp.R;
 import fb.fandroid.adv.joindbviewmodelapp.album.DetailAlbumFragment;
 
+import fb.fandroid.adv.joindbviewmodelapp.db.MusicDao;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -74,6 +75,12 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         ApiUtils.getApiService().getAlbums()
                 .subscribeOn(Schedulers.io())
+                .doOnSuccess(albums -> getMusicDao().insertAlbums(albums))
+                .onErrorReturn(throwable -> {
+                    if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
+                        return getMusicDao().getAlbums();
+                    } else return null;
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mRefresher.setRefreshing(true))
                 .doFinally(() -> mRefresher.setRefreshing(false))
@@ -87,6 +94,11 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             mErrorView.setVisibility(View.VISIBLE);
                             mRecyclerView.setVisibility(View.GONE);
                         });
+    }
+
+    private MusicDao getMusicDao() {
+        return ((App) getActivity().getApplication()).getDatabase().getMusicDao();
+
     }
 
 }
