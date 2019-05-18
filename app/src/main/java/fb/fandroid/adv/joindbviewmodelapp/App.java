@@ -1,4 +1,4 @@
-package fb.fandroid.adv.joindbviewmodelapp.albums;
+package fb.fandroid.adv.joindbviewmodelapp;
 
 import android.app.Application;
 import android.arch.persistence.room.Room;

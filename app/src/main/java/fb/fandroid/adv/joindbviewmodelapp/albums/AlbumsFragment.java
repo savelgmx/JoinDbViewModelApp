@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import fb.fandroid.adv.joindbviewmodelapp.ApiUtils;
+import fb.fandroid.adv.joindbviewmodelapp.App;
 import fb.fandroid.adv.joindbviewmodelapp.R;
 import fb.fandroid.adv.joindbviewmodelapp.album.DetailAlbumFragment;
 
