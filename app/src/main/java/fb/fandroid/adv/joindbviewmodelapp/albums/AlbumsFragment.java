@@ -73,7 +73,6 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     private void getAlbums() {
-
         ApiUtils.getApiService().getAlbums()
                 .subscribeOn(Schedulers.io())
                 .doOnSuccess(albums -> getMusicDao().insertAlbums(albums))
@@ -90,10 +89,6 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             mErrorView.setVisibility(View.GONE);
                             mRecyclerView.setVisibility(View.VISIBLE);
                             mAlbumAdapter.addData(albums, true);
-                        },
-                        throwable -> {
-                            mErrorView.setVisibility(View.VISIBLE);
-                            mRecyclerView.setVisibility(View.GONE);
                         });
     }
 
