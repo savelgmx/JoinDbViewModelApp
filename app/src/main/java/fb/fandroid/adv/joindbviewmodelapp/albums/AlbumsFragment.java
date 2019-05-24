@@ -75,7 +75,10 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private void getAlbums() {
         ApiUtils.getApiService().getAlbums()
                 .subscribeOn(Schedulers.io())
-                .doOnSuccess(albums -> getMusicDao().insertAlbums(albums))
+                .doOnSuccess(albums -> {
+                            getMusicDao().deleteAlbums();//сначала удаляем старую базу чтобы не разрасталась до бесконечности
+                            getMusicDao().insertAlbums(albums); //затем наполняем ее по новой
+                })
                 .onErrorReturn(throwable -> {
                     if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
                         return getMusicDao().getAlbums();
