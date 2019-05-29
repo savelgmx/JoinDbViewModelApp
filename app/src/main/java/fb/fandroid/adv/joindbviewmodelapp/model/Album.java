@@ -28,7 +28,7 @@ public class Album implements Serializable {
     private String mReleaseDate;
 
     @SerializedName("songs")
-
+    @ColumnInfo(name = "song_id")
     @Ignore //этот список вы должны сохранять руками, по примеру Азрета,
     // когда получаете объект альбома с сервера на экране отображения альбома
     private List<Song> mSongs;
@@ -57,7 +57,7 @@ public class Album implements Serializable {
         mReleaseDate = releaseDate;
     }
 
-    public List<Song> getSongs() {
+     public List<Song> getSongs() {
         return mSongs;
     }
 

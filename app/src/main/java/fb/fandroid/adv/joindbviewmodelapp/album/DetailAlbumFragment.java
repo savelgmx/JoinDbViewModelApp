@@ -11,13 +11,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import fb.fandroid.adv.joindbviewmodelapp.ApiUtils;
-import fb.fandroid.adv.joindbviewmodelapp.R;
-import fb.fandroid.adv.joindbviewmodelapp.model.Album;
+import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import fb.fandroid.adv.joindbviewmodelapp.ApiUtils;
+import fb.fandroid.adv.joindbviewmodelapp.App;
+import fb.fandroid.adv.joindbviewmodelapp.R;
+import fb.fandroid.adv.joindbviewmodelapp.db.MusicDao;
+import fb.fandroid.adv.joindbviewmodelapp.model.Album;
+import fb.fandroid.adv.joindbviewmodelapp.model.Song;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String ALBUM_KEY = "ALBUM_KEY";
@@ -78,27 +82,45 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
 
     private void getAlbum() {
 
-        ApiUtils.getApiService().getAlbum(mAlbum.getId()).enqueue(new Callback<Album>() {
+        ApiUtils.getApiService()
+                .getAlbum(mAlbum.getId())
+                .subscribeOn(Schedulers.io())
+                .doOnSuccess(albums -> {
+                    List<Song> songs = albums.getSongs();
+                    for (Song s: songs) {
+                        s.setAlbumId(mAlbum.getId());
+                    }
+                    getMusicDAO().insertSongs(songs);
+                })
+                .onErrorReturn(new Function<Throwable, Album>() {
             @Override
-            public void onResponse(Call<Album> call, Response<Album> response) {
-                if (response.isSuccessful()) {
+                    public Album apply(Throwable throwable) throws Exception {
+                        if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
+                            Album album = new Album();
+                            album.setSongs(getMusicDAO().getSongsByAlbumId(mAlbum.getId()));
+                            return album;
+                        }
+                        return null;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> mRefresher.setRefreshing(true))
+                .doFinally(() -> mRefresher.setRefreshing(false))
+                .subscribe(
+                        albums -> {
                     mErrorView.setVisibility(View.GONE);
                     mRecyclerView.setVisibility(View.VISIBLE);
-                    mSongsAdapter.addData(response.body().getSongs(), true);
-                } else {
+                            mSongsAdapter.addData(albums.getSongs(), true);
+                        },
+                        throwable -> {
                     mErrorView.setVisibility(View.VISIBLE);
                     mRecyclerView.setVisibility(View.GONE);
                 }
-                mRefresher.setRefreshing(false);
-            }
-
-            @Override
-            public void onFailure(Call<Album> call, Throwable t) {
-                mErrorView.setVisibility(View.VISIBLE);
-                mRecyclerView.setVisibility(View.GONE);
-                mRefresher.setRefreshing(false);
-            }
-        });
+                );
     }
+    private MusicDao getMusicDAO() {
+        return ((App)getActivity().getApplication()).getDatabase().getMusicDao();
+    }
+
 
 }

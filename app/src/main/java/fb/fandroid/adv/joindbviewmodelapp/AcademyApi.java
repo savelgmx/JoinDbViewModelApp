@@ -23,11 +23,13 @@ public interface AcademyApi {
     @POST("registration")
     Completable registration(@Body User user);
 
+    @GET("user")
+    Single<User> authentication();
     @GET("albums")
     Single<List<Album>> getAlbums();
 
     @GET("albums/{id}")
-    Call<Album> getAlbum(@Path("id") int id);
+    Single<Album> getAlbum(@Path("id") int id);
 
     @GET("songs")
     Call<List<Song>> getSongs();

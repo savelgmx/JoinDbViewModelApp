@@ -2,16 +2,23 @@ package fb.fandroid.adv.joindbviewmodelapp.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
 /**
  * Created by marat.taychinov
  */
-@Entity
+
+@Entity(foreignKeys = {
+        @ForeignKey(entity = Album.class, parentColumns = "id", childColumns = "album_id",onDelete = CASCADE, onUpdate = CASCADE)
+})
+
 public class Song implements Serializable {
 
     @PrimaryKey
@@ -26,6 +33,17 @@ public class Song implements Serializable {
     @ColumnInfo(name = "duration")
     @SerializedName("duration")
     private String mDuration;
+
+    @ColumnInfo(name = "album_id")
+    private int mAlbumId;
+
+    public int getAlbumId() {
+        return mAlbumId;
+    }
+
+    public void setAlbumId(int albumId) {
+        mAlbumId = albumId;
+    }
 
     public int getId() {
         return mId;
