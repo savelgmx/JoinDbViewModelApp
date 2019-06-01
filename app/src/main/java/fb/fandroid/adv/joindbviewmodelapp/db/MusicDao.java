@@ -20,7 +20,8 @@ public interface MusicDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAlbums(List<Album> albums);
 
-    @Query("SELECT * from album")
+
+    @Query("SELECT * from album ORDER by `release`")
     List<Album> getAlbums();
 
     //удалить альбом
@@ -42,11 +43,14 @@ public interface MusicDao {
     @Query("DELETE FROM song where id = :songId")
     int deleteSongById(int songId);
 
-    @Query("SELECT * FROM song")
+    @Query("SELECT * FROM song ORDER by id ")
     List<Song> getSongs();
 
-    @Query("SELECT * FROM song WHERE album_id = :albumId")
+    @Query("SELECT * FROM song WHERE album_id = :albumId ORDER by id ")
     List<Song> getSongsByAlbumId(int albumId);
+
+   // void insertAlbums(Object albums);
+
     //*******End Song
 
 }

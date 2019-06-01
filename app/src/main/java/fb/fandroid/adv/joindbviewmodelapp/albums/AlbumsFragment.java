@@ -15,8 +15,9 @@ import fb.fandroid.adv.joindbviewmodelapp.ApiUtils;
 import fb.fandroid.adv.joindbviewmodelapp.App;
 import fb.fandroid.adv.joindbviewmodelapp.R;
 import fb.fandroid.adv.joindbviewmodelapp.album.DetailAlbumFragment;
-
 import fb.fandroid.adv.joindbviewmodelapp.db.MusicDao;
+import fb.fandroid.adv.joindbviewmodelapp.model.Album;
+import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -75,20 +76,33 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private void getAlbums() {
         ApiUtils.getApiService().getAlbums()
                 .subscribeOn(Schedulers.io())
+                .flatMap(Flowable::fromIterable)
+                .sorted((Album o1, Album o2) -> o1.getReleaseDate().compareTo(o2.getReleaseDate()))
+                .toList()
                 .doOnSuccess(albums -> {
                             getMusicDao().deleteAlbums();//сначала удаляем старую базу чтобы не разрасталась до бесконечности
                             getMusicDao().insertAlbums(albums); //затем наполняем ее по новой
                 })
+
                 .onErrorReturn(throwable -> {
                     if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
                         return getMusicDao().getAlbums();
                     } else return null;
                 })
+
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mRefresher.setRefreshing(true))
+
+
                 .doFinally(() -> mRefresher.setRefreshing(false))
+
+   //             .sorted((Album o1, Album o2) -> o1.getReleaseDate().compareTo(o2.getReleaseDate()))
+
                 .subscribe(
+
+
                         albums -> {
+
                             mErrorView.setVisibility(View.GONE);
                             mRecyclerView.setVisibility(View.VISIBLE);
                             mAlbumAdapter.addData(albums, true);

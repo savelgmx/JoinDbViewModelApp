@@ -7,6 +7,7 @@ import fb.fandroid.adv.joindbviewmodelapp.model.Album;
 import fb.fandroid.adv.joindbviewmodelapp.model.Song;
 import fb.fandroid.adv.joindbviewmodelapp.model.User;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -23,10 +24,8 @@ public interface AcademyApi {
     @POST("registration")
     Completable registration(@Body User user);
 
-    @GET("user")
-    Single<User> authentication();
     @GET("albums")
-    Single<List<Album>> getAlbums();
+    Flowable<List<Album>> getAlbums();
 
     @GET("albums/{id}")
     Single<Album> getAlbum(@Path("id") int id);

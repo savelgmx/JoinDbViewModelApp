@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Collections;
 import java.util.List;
 
 import fb.fandroid.adv.joindbviewmodelapp.ApiUtils;
@@ -80,14 +81,15 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
         });
     }
 
-    private void getAlbum() {
+     private void getAlbum() {
 
         ApiUtils.getApiService()
                 .getAlbum(mAlbum.getId())
                 .subscribeOn(Schedulers.io())
                 .doOnSuccess(albums -> {
+
                     List<Song> songs = albums.getSongs();
-                    for (Song s: songs) {
+                      for (Song s: songs) {
                         s.setAlbumId(mAlbum.getId());
                     }
                     getMusicDAO().insertSongs(songs);
@@ -102,15 +104,21 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
                         }
                         return null;
                     }
-                })
+               })
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mRefresher.setRefreshing(true))
                 .doFinally(() -> mRefresher.setRefreshing(false))
                 .subscribe(
+
                         albums -> {
+                         //-сортировка песен по Id
+                            List<Song> songs = albums.getSongs();
+                            Collections.sort(songs, (o1, o2) -> Integer.compare(o1.getId(),o2.getId()));
+                         //*****************
                     mErrorView.setVisibility(View.GONE);
                     mRecyclerView.setVisibility(View.VISIBLE);
-                            mSongsAdapter.addData(albums.getSongs(), true);
+                    mSongsAdapter.addData(albums.getSongs(), true);
+
                         },
                         throwable -> {
                     mErrorView.setVisibility(View.VISIBLE);
