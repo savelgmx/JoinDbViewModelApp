@@ -4,6 +4,7 @@ package fb.fandroid.adv.joindbviewmodelapp;
 import java.util.List;
 
 import fb.fandroid.adv.joindbviewmodelapp.model.Album;
+import fb.fandroid.adv.joindbviewmodelapp.model.Comment;
 import fb.fandroid.adv.joindbviewmodelapp.model.Song;
 import fb.fandroid.adv.joindbviewmodelapp.model.User;
 import io.reactivex.Completable;
@@ -24,8 +25,11 @@ public interface AcademyApi {
     @POST("registration")
     Completable registration(@Body User user);
 
+    @GET("user")
+    Single<User> getUser();
+
     @GET("albums")
-    Flowable<List<Album>> getAlbums();
+    Flowable<List<Album>> getAlbums(); //сделал чтобы был сортовка
 
     @GET("albums/{id}")
     Single<Album> getAlbum(@Path("id") int id);
@@ -35,4 +39,15 @@ public interface AcademyApi {
 
     @GET("songs/{id}")
     Call<Song> getSong(@Path("id") int id);
+
+
+    @POST("comments")
+    Completable postComment(@Body Comment comment);
+
+    @GET("comments")
+    Single<List<Comment>> getComments();
+
+    @GET("albums/{id}/comments")
+    Single<List<Comment>> getCommentsAlbum(@Path("id") int id);
+
 }

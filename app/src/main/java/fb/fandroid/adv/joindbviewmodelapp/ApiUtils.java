@@ -1,5 +1,7 @@
 package fb.fandroid.adv.joindbviewmodelapp;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.Gson;
 
 import java.net.ConnectException;
@@ -71,5 +73,19 @@ public class ApiUtils {
             api = getRetrofit().create(AcademyApi.class);
         }
         return api;
+    }
+    public static AcademyApi getApiService(@NonNull String email, @NonNull String password) {
+        return getRetrofit(email, password).create(AcademyApi.class);
+    }
+
+    public static Retrofit getRetrofit(String email, String password) {
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BuildConfig.SERVER_URL)
+                .client(getBasicAuthClient(email, password, true))
+                .addConverterFactory(new DataConverterFactory())
+                .addConverterFactory(GsonConverterFactory.create(new Gson()))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+        return retrofit;
     }
 }

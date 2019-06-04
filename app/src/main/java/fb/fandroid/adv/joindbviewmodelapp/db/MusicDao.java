@@ -8,6 +8,7 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import fb.fandroid.adv.joindbviewmodelapp.model.Album;
+import fb.fandroid.adv.joindbviewmodelapp.model.Comment;
 import fb.fandroid.adv.joindbviewmodelapp.model.Song;
 
 /**
@@ -33,12 +34,8 @@ public interface MusicDao {
     void deleteAlbumById(int albumId);
 
     //***************Song
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertSongs(List<Song> songs);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertSong(Song song);
 
     @Query("DELETE FROM song where id = :songId")
     int deleteSongById(int songId);
@@ -48,9 +45,17 @@ public interface MusicDao {
 
     @Query("SELECT * FROM song WHERE album_id = :albumId ORDER by id ")
     List<Song> getSongsByAlbumId(int albumId);
-
-   // void insertAlbums(Object albums);
-
     //*******End Song
+
+    @Query("SELECT * from comment WHERE album_id = :albumId")
+    List<Comment> getCommentsByAlbumId(int albumId);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertComments(List<Comment> comments);
+
+    @Query("SELECT * from comment")
+    List<Comment> getComments();
+
+
 
 }
