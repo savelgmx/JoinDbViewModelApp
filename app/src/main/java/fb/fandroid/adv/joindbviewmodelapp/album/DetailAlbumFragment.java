@@ -8,6 +8,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -17,6 +20,7 @@ import java.util.List;
 import fb.fandroid.adv.joindbviewmodelapp.ApiUtils;
 import fb.fandroid.adv.joindbviewmodelapp.App;
 import fb.fandroid.adv.joindbviewmodelapp.R;
+import fb.fandroid.adv.joindbviewmodelapp.comments.CommentsFragment;
 import fb.fandroid.adv.joindbviewmodelapp.db.MusicDao;
 import fb.fandroid.adv.joindbviewmodelapp.model.Album;
 import fb.fandroid.adv.joindbviewmodelapp.model.Song;
@@ -45,6 +49,11 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        super.onCreate(savedInstanceState);
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -126,6 +135,28 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
                 }
                 );
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.findItem(R.id.add_comment).setVisible(true);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.add_comment){
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainer, CommentsFragment.newInstance(mAlbum))
+                    .addToBackStack(DetailAlbumFragment.class.getSimpleName())
+                    .commit();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+
     private MusicDao getMusicDAO() {
         return ((App)getActivity().getApplication()).getDatabase().getMusicDao();
     }

@@ -105,7 +105,7 @@ public class CommentsFragment extends Fragment implements SwipeRefreshLayout.OnR
         mRefresher.post(() -> {
             mRefresher.setRefreshing(true);
             getComments();
-            //mRecyclerView.scrollToPosition(mCommentsAdapter.getItemCount() - 1);
+            mRecyclerView.scrollToPosition(mCommentsAdapter.getItemCount() - 1);
         });
     }
 
@@ -113,7 +113,7 @@ public class CommentsFragment extends Fragment implements SwipeRefreshLayout.OnR
     private void getComments() {
         ApiUtils.getApiService().getCommentsAlbum(mAlbum.getId())
                 .subscribeOn(Schedulers.io())
-                /*.doOnSuccess(comments -> getMusicDao().insertComments(comments))*/
+                .doOnSuccess(comments -> getMusicDao().insertComments(comments))
                 .onErrorReturn(throwable -> {
                     if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
                         getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Нет подключения!", Toast.LENGTH_SHORT).show());
